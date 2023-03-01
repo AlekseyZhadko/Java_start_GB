@@ -12,10 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class AppendStoreToyFrame implements ActionListener {
-    public static JFrame FrameAppendToy = new JFrame("Toy Store - append toy");
-
     public void actionPerformed(ActionEvent e) {
-
+        JFrame FrameAppendToy = new JFrame("Toy Store - append toy");
         FrameAppendToy.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -69,28 +67,21 @@ public class AppendStoreToyFrame implements ActionListener {
 
         CheckFileExists.Check();
 
-        ExitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                FrameAppendToy.dispose();
-            }
-        });
+        ExitButton.addActionListener(e13 -> FrameAppendToy.dispose());
 
-        SaveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int x = Integer.parseInt(countJText.getText());
+        SaveButton.addActionListener(e12 -> {
+            try {
+                int x = Integer.parseInt(countJText.getText());
 
-                    if (x < 0 || nameJText.getText().equals("")) {
-                        JOptionPane.showMessageDialog(FrameAppendToy, "invalid value!");
-                    } else {
-                        WriteJsonFile.Write(AppendToy.Append(ReadJsonStoreToy.Read(Model.getPathDBStoreToy())
-                                , nameJText.getText(), x), Model.getPathDBStoreToy());
-                        JOptionPane.showMessageDialog(FrameAppendToy, "data saved successfully!");
-                    }
-                } catch (NumberFormatException e1) {
+                if (x < 0 || nameJText.getText().equals("")) {
                     JOptionPane.showMessageDialog(FrameAppendToy, "invalid value!");
+                } else {
+                    WriteJsonFile.Write(AppendToy.Append(ReadJsonStoreToy.Read(Model.getPathDBStoreToy())
+                            , nameJText.getText(), x), Model.getPathDBStoreToy());
+                    JOptionPane.showMessageDialog(FrameAppendToy, "data saved successfully!");
                 }
+            } catch (NumberFormatException e1) {
+                JOptionPane.showMessageDialog(FrameAppendToy, "invalid value!");
             }
         });
     }

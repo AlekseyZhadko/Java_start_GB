@@ -21,7 +21,9 @@ public class CheckFileExists {
         }
 
         File StoreToyFile = new File(Model.getPathDBStoreToy());
-        if (StoreToyFile.exists() == false || isEmptyFile(Model.getPathDBStoreToy())) {
+        if (StoreToyFile.exists() == false ||
+                isEmptyFile(Model.getPathDBStoreToy()) ||
+                StoreToyFile.length() == 2) {
             List<Toy> newToys = new ArrayList<>();
             newToys.add(new Toy());
             WriteJsonFile.Write(newToys, Model.getPathDBStoreToy());

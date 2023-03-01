@@ -1,20 +1,14 @@
 [
   {
     "id": 1,
-    "name": "Doll",
-    "count": 5,
-    "weight": 26
+    "name": "car",
+    "count": 2,
+    "weight": 50
   },
   {
     "id": 2,
-    "name": "car",
-    "count": 4,
-    "weight": 21
-  },
-  {
-    "id": 3,
-    "name": "bear",
-    "count": 10,
-    "weight": 52
+    "name": "doll",
+    "count": 2,
+    "weight": 50
   }
 ]

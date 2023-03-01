@@ -1,20 +1,16 @@
 package GBJavaAttestation.UI;
 
 import GBJavaAttestation.Actions.CheckFileExists;
+import GBJavaAttestation.Actions.EditToy;
+import GBJavaAttestation.Actions.ReadJsonStoreToy;
+import GBJavaAttestation.Actions.WriteJsonFile;
+import GBJavaAttestation.Core.MVP.Model;
 import GBJavaAttestation.Core.Models.Toy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class EditToyFrame implements ActionListener {
@@ -96,100 +92,41 @@ public class EditToyFrame implements ActionListener {
 
         CheckFileExists.Check();
 
-        ExitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                FrameEditToy.dispose();
+        ExitButton.addActionListener(e13 -> FrameEditToy.dispose());
+
+        FindButton.addActionListener(e12 -> {
+            int id = 0;
+            try {
+                id = Integer.parseInt(idJText.getText());
+                List<Toy> toys = ReadJsonStoreToy.Read(Model.getPathDBStoreToy());
+                int flag = 0;
+                for (Toy el : toys) {
+                    if (el.getId() == id) {
+                        nameJText.setText(el.getName());
+                        countJText.setText(Integer.toString(el.getCount()));
+                        SaveButton.setEnabled(true);
+                        flag = 1;
+                        idJText.setEnabled(false);
+                    }
+                }
+                if (flag == 0) {
+                    JOptionPane.showMessageDialog(FrameEditToy, "the ID does not exist!");
+                }
+            } catch (NumberFormatException e1) {
+                JOptionPane.showMessageDialog(FrameEditToy, "invalid value!");
             }
         });
 
-        FindButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int id = 0;
-                try {
-                    id = Integer.parseInt(idJText.getText());
-                } catch (NumberFormatException e1) {
-                    JOptionPane.showMessageDialog(FrameEditToy, "invalid value!");
-                }
-
-                try {
-                    Gson gson = new Gson();
-                    Reader reader = Files.newBufferedReader(Paths.get("src/main/java/GBJavaAttestation/DataBase/StoreToy.json"));
-                    List<Toy> toys = Arrays.asList(gson.fromJson(reader, Toy[].class));
-                    reader.close();
-
-                    if (toys.isEmpty()) {
-                        JOptionPane.showMessageDialog(FrameEditToy, "The file with toys is empty!");
-                    } else {
-                        int flag = 0;
-                        for (Toy el : toys) {
-                            if (el.getId() == id) {
-                                nameJText.setText(el.getName());
-                                countJText.setText(Integer.toString(el.getCount()));
-                                SaveButton.setEnabled(true);
-                                flag = 1;
-                                idJText.setEnabled(false);
-                            }
-                        }
-                        if (flag == 0) {
-                            JOptionPane.showMessageDialog(FrameEditToy, "the ID does not exist!");
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
-        SaveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int x = 0;
-                try {
-                    x = Integer.parseInt(countJText.getText());
-                } catch (NumberFormatException e1) {
-                    JOptionPane.showMessageDialog(FrameEditToy, "invalid value!");
-                }
-
-                try {
-                    Gson gson = new Gson();
-                    Reader reader = Files.newBufferedReader(Paths.get("src/main/java/GBJavaAttestation/DataBase/StoreToy.json"));
-                    List<Toy> toys = Arrays.asList(gson.fromJson(reader, Toy[].class));
-                    reader.close();
-
-                    int allCount = 0;
-                    for (Toy el : toys) {
-                        if (el.getId() == Integer.parseInt(idJText.getText())) {
-                            allCount += x;
-                        } else {
-                            allCount += el.getCount();
-                        }
-                    }
-
-
-                    List<Toy> newToys = new ArrayList<>();
-                    for (Toy el : toys) {
-                        if (el.getId() == Integer.parseInt(idJText.getText())) {
-                            el.setWeight(x * 100 / allCount);
-                            el.setName(nameJText.getText());
-                            el.setCount(x);
-                            newToys.add(el);
-                        } else {
-                            el.setWeight(el.getCount() * 100 / allCount);
-                            newToys.add(el);
-                        }
-                    }
-
-                    Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
-                    Writer writer = Files.newBufferedWriter(Paths.get("src/main/java/GBJavaAttestation/DataBase/StoreToy.json"));
-                    gsonBuilder.toJson(newToys, writer);
-                    writer.close();
-                    idJText.setEnabled(true);
-                    JOptionPane.showMessageDialog(FrameEditToy, "data saved successfully!");
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+        SaveButton.addActionListener(e14 -> {
+            int x = 0;
+            try {
+                x = Integer.parseInt(countJText.getText());
+                WriteJsonFile.Write(EditToy.Edit(ReadJsonStoreToy.Read(Model.getPathDBStoreToy())
+                        , nameJText.getText(), x, idJText.getText()), Model.getPathDBStoreToy());
+                idJText.setEnabled(true);
+                JOptionPane.showMessageDialog(FrameEditToy, "data saved successfully!");
+            } catch (NumberFormatException e1) {
+                JOptionPane.showMessageDialog(FrameEditToy, "invalid value!");
             }
         });
     }

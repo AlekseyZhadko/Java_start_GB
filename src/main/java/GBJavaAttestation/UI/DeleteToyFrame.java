@@ -1,19 +1,15 @@
 package GBJavaAttestation.UI;
 
+import GBJavaAttestation.Actions.DeleteToy;
+import GBJavaAttestation.Actions.ReadJsonStoreToy;
+import GBJavaAttestation.Actions.WriteJsonFile;
+import GBJavaAttestation.Core.MVP.Model;
 import GBJavaAttestation.Core.Models.Toy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DeleteToyFrame implements ActionListener {
@@ -95,86 +91,37 @@ public class DeleteToyFrame implements ActionListener {
         FrameDeleteToy.setVisible(true);
         FrameDeleteToy.setLocationRelativeTo(null);
 
-        ExitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                FrameDeleteToy.dispose();
-            }
-        });
+        ExitButton.addActionListener(e12 -> FrameDeleteToy.dispose());
 
-        FindButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int id = 0;
-                try {
-                    id = Integer.parseInt(idJText.getText());
-                } catch (NumberFormatException e1) {
-                    JOptionPane.showMessageDialog(FrameDeleteToy, "invalid value!");
-                }
-
-                try {
-                    Gson gson = new Gson();
-                    Reader reader = Files.newBufferedReader(Paths.get("src/main/java/GBJavaAttestation/DataBase/StoreToy.json"));
-                    List<Toy> toys = Arrays.asList(gson.fromJson(reader, Toy[].class));
-                    reader.close();
-
-                    if (toys.isEmpty()) {
-                        JOptionPane.showMessageDialog(FrameDeleteToy, "The file with toys is empty!");
-                    } else {
-                        int flag = 0;
-                        for (Toy el : toys) {
-                            if (el.getId() == id) {
-                                nameJText.setText(el.getName());
-                                countJText.setText(Integer.toString(el.getCount()));
-                                DeleteButton.setEnabled(true);
-                                flag = 1;
-                            }
-                        }
-                        if (flag == 0) {
-                            JOptionPane.showMessageDialog(FrameDeleteToy, "the ID does not exist!");
-                        }
+        FindButton.addActionListener(e13 -> {
+            int id = 0;
+            try {
+                id = Integer.parseInt(idJText.getText());
+                List<Toy> toys = ReadJsonStoreToy.Read(Model.getPathDBStoreToy());
+                int flag = 0;
+                for (Toy el : toys) {
+                    if (el.getId() == id) {
+                        nameJText.setText(el.getName());
+                        countJText.setText(Integer.toString(el.getCount()));
+                        DeleteButton.setEnabled(true);
+                        flag = 1;
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
                 }
+                if (flag == 0) {
+                    JOptionPane.showMessageDialog(FrameDeleteToy, "the ID does not exist!");
+                }
+            } catch (NumberFormatException e1) {
+                JOptionPane.showMessageDialog(FrameDeleteToy, "invalid value!");
             }
         });
 
 
-        DeleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Gson gson = new Gson();
-                    Reader reader = Files.newBufferedReader(Paths.get("src/main/java/GBJavaAttestation/DataBase/StoreToy.json"));
-                    List<Toy> toys = Arrays.asList(gson.fromJson(reader, Toy[].class));
-                    reader.close();
-
-                    int allCount = 0;
-                    for (Toy el : toys) {
-                        if (el.getId() != Integer.parseInt(idJText.getText())) {
-                            allCount += el.getCount();
-                        }
-                    }
-
-                    List<Toy> newToys = new ArrayList<>();
-                    for (Toy el : toys) {
-                        if (el.getId() != Integer.parseInt(idJText.getText())) {
-                            el.setWeight(el.getCount() * 100 / allCount);
-                            newToys.add(el);
-                        }
-                    }
-
-                    Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
-                    Writer writer = Files.newBufferedWriter(Paths.get("src/main/java/GBJavaAttestation/DataBase/StoreToy.json"));
-                    gsonBuilder.toJson(newToys, writer);
-                    writer.close();
-                    idJText.setEnabled(true);
-                    JOptionPane.showMessageDialog(FrameDeleteToy, "data saved successfully!");
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+        DeleteButton.addActionListener(e14 -> {
+            WriteJsonFile.Write(DeleteToy.Delete(ReadJsonStoreToy.Read(Model.getPathDBStoreToy())
+                    , idJText.getText()), Model.getPathDBStoreToy());
+            idJText.setEnabled(true);
+            DeleteButton.setEnabled(false);
+            JOptionPane.showMessageDialog(FrameDeleteToy, "data saved successfully!");
         });
     }
 }
