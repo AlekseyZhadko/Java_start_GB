@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Doll",
+    "count": 5,
+    "weight": 26
+  },
+  {
+    "id": 2,
+    "name": "car",
+    "count": 4,
+    "weight": 21
+  },
+  {
+    "id": 3,
+    "name": "bear",
+    "count": 10,
+    "weight": 52
+  }
+]
